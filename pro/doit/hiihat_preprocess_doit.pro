@@ -32,7 +32,10 @@ PRO HIIHAT_PREPROCESS_DOIT, in_fname, out_filename,$
   ; load an image (code from the envi user guide)
   ;  ENVI_SELECT, fid=in_file_id, title="Select an input image", dims=use_dims, /NO_SPEC
   ENVI_OPEN_FILE,in_fname, R_FID = in_file_id
-  IF (in_file_id EQ -1) THEN GOTO, cleanup
+  IF (in_file_id EQ -1) THEN BEGIN
+    IF debug THEN PRINT, 'ENVI Open File Failed. -- ' + in_fname
+    GOTO, cleanup
+  ENDIF
   ENVI_FILE_QUERY, in_file_id, descrip=descrip, dims=use_dims
 
   HIIHAT_PREPROCESS, in_file_id, $
