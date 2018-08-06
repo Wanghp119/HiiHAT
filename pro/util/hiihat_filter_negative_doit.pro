@@ -46,7 +46,7 @@ PRO hiihat_filter_negative_doit, fid, out_filename, r_fid=r_fid
     writeu, lun, img  ;write temp
   endfor
 
-  free_lun, lun  ;;close
+  free_lun, lun, /FORCE  ;;close
 
   ; Write Head File
   ENVI_SETUP_HEAD, fname=out_filename,  $

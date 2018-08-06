@@ -52,5 +52,6 @@ PRO HIIHAT_PREPROCESS_DOIT, in_fname, out_filename,$
 
   CLEANUP:
   IF debug THEN PRINT, "Exiting "+title
-  ENVI_BATCH_EXIT
+  if in_file_id ne -1 then ENVI_FILE_MNG, in_file_id, /REMOVE
+  ENVI_BATCH_EXIT  
 END

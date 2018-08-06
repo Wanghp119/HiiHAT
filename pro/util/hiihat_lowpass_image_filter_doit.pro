@@ -73,7 +73,7 @@ pro hiihat_lowpass_image_filter_doit, fid, filt_size,$
     envi_report_stat, base, i, n_bands-1, cancel=cancel
     if cancel then goto, cleanup
 
-    img = envi_get_data(FID=fid, DIMS=dims, pos=selected_bands[i])
+    img = envi_get_data(FID=fid, DIMS=dims, pos=i)
     
     img[*,*] = convol(float(img[*,*]), kernel, $
       /center, /edge_truncate)
@@ -81,7 +81,8 @@ pro hiihat_lowpass_image_filter_doit, fid, filt_size,$
     writeu, lun, img
   endfor
 
-  free_lun, lun  ;close file
+  img = 0;
+  free_lun, lun, /FORCE  ;close file
 
   ; Write Head File
   ENVI_SETUP_HEAD, fname=out_filename,  $

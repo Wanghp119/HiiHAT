@@ -88,7 +88,7 @@ pro hiihat_normalize_image_doit, fid, norm_type,$
   endfor
   
   img_tile = 0;
-  free_lun, lun ;CLOSE LUN
+  free_lun, lun, /FORCE;CLOSE LUN
   
   ; Write Head File
   ENVI_SETUP_HEAD, fname=out_filename,  $

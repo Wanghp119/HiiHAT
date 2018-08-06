@@ -41,7 +41,8 @@ PRO hiihat_subset_doit, in_fid, selected_bands, $
     writeu, lun, img
   endfor
 
-  close, lun  ;close file
+   img = 0
+  free_lun, lun, /FORCE  ;close file
 
   ; Write Head File
   ENVI_SETUP_HEAD, fname=out_filename,  $

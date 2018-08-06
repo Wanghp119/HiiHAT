@@ -247,7 +247,7 @@ pro hiihat_preprocess, in_file_id, $
       hiihat_divide_mean, img, 'Spectrum', denom_spectrum=denom_spectrum
     endif
 
-    if verbose and lowpass_filter then $
+    if verbose and lowpass_filter gt 0 then $
       print, "Spatial low pass filtering, filter size: ", lowpass_filter
     hiihat_lowpass_image_filter, img, lowpass_filter
 
@@ -312,7 +312,7 @@ pro hiihat_preprocess, in_file_id, $
       endif
 
       if in_fid ne in_file_id then $
-        ENVI_FILE_MNG, ID=in_fid, /remove, /delete
+        ENVI_FILE_MNG, id=in_fid, /remove, /delete
       in_fid = out_id  ;next process input fid
     endif
 
@@ -396,10 +396,10 @@ pro hiihat_preprocess, in_file_id, $
     ;;------------------------------------------;;
     ;; 6- lowpass filter
     ;;------------------------------------------;;
-    if lowpass_filter then begin
+    if lowpass_filter gt 0 then begin
       if verbose then print, "Spatial low pass filtering, filter size: ", lowpass_filter
       temp_filename = hiihat_get_temp_file_path(out_filename, suffix='_tmp_lowpass')
-      hiihat_lowpass_image_filter, in_fid, lowpass_filter, $
+      hiihat_lowpass_image_filter_doit, in_fid, lowpass_filter, $
         temp_filename, r_fid=out_id
       if out_id eq -1 then begin
         print, 'Spatial low pass filtering failed.'
@@ -464,7 +464,7 @@ pro hiihat_preprocess, in_file_id, $
 	endfor
 
   img = 0;
-	free_lun, lun;close file
+	free_lun, lun, /FORCE;close file
 
 	;; delete temp file
 	if in_fid ne in_file_id then $

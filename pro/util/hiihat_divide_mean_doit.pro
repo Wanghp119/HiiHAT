@@ -48,7 +48,7 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
 
   if div_type eq "None" then goto, cleanup
 
-  ENVI_FILE_QUERY, fid, nl=m_lines, $
+  ENVI_FILE_QUERY, fid, nl=n_lines, $
     ns=n_samples, nb=n_bands, dims=dims,$
     wl=wl,data_type=dt, offset=offset,$
     map_info = map_info,   $
@@ -69,12 +69,14 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
     print, 'open file failed.'
     goto, cleanup
   endif
-
+  
   ;; divide by mean spectrum
   ;; but you've got to do better than this...
   ;; you can't let negative values into your averaging, unfortunately,
   ;; making the entire calculation take a ton more time
   if div_type eq "Spatial Mean" then begin
+    img = fltarr(n_samples, n_lines)
+
     for j=0,(n_bands-1) do begin
       band_mean   = 0.0
       if j mod mod_step eq 0 then begin
@@ -94,6 +96,7 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
     ;; you can't let negative values into your averaging, unfortunately,
     ;; making the entire calculation take a ton more time
     ;; column dependence is to remove striping noise effects
+    img = fltarr(n_samples, n_lines)
     for j=0,(n_bands-1) do begin
       if j mod mod_step eq 0 then begin
         envi_report_stat, base, j, n_bands-1, cancel=cancel
@@ -101,7 +104,7 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
       endif
       for x=0,n_samples-1 do begin
         ;; print, x, j
-        band_mean   = 0.0
+        band_mean = 0.0
         img = envi_get_data(FID=fid, dims=dims, pos=j)
         idx = where(img[x,*] gt 0.0)
         band_mean = mean(image[x,idx])
@@ -113,6 +116,7 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
   endif else if div_type eq "Spectrum" then begin
     ;; divide the image by the given spectrum
     if keyword_set(denom_spectrum) then begin
+      img = fltarr(n_samples, n_lines)
       for j=0,(n_bands-1) do begin
         img = envi_get_data(FID=fid, dims=dims, pos=j)
         img = img / denom_spectrum[j]
@@ -126,7 +130,8 @@ pro hiihat_divide_mean_doit, fid, div_type, out_filename,$
     print, "Unknown div_type: ", div_type
   endelse
 
-  close, lun;
+  img = 0;
+  free_lun, lun, /FORCE;
 
   ; Write Head File
   ENVI_SETUP_HEAD, fname=out_filename,  $
